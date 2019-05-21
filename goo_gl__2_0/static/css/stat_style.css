@@ -1,0 +1,50 @@
+.stat-container {
+	background-color: white;
+	border-radius: 1em;
+	width: 80%;
+	height: 90%;
+	margin: 2em auto auto auto;
+	overflow: auto;
+	max-height:16em;
+}
+
+.link-container {
+	display: flex;
+	flex-direction: row;
+	width: 90%;
+	margin: 0.12em auto;
+	background-color: #7cbfbb;
+	border-radius: 0.4em;
+}
+
+.vertical-link-container {
+	display: flex;
+	flex-direction: column;
+	height: 2.5em;
+	margin: 0.12em 0 0 0.5em;
+}
+
+.list-container-space{
+	flex: 1;
+}
+
+.view-stat-counter {
+	flex-basis: 20;
+	font-size: 2em;
+	margin-right: 0.3em;
+}
+
+a {
+	color: black;
+}
+
+.link-stat {
+	margin-bottom: 0.2em;
+	line-height: 1em;
+	height: 1em;
+	max-width: 18em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-decoration: none;
+}

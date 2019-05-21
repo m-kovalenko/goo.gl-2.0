@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <span><input id='link-input' name='link' autofocus></input></span>
+	<span style='display:{{ display_private_checkbox }};'><input id='is-private-checkbox' name='is_private' type='checkbox'>is private</input></span>
+	<span><button id='submit-button' class='submit-button' onclick='make_xhr()' >Submit</button></span>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<title>I will save your link</title>
+		
+		<link rel="stylesheet" type="text/css" href="../static/css/style.css">
+		<link rel="stylesheet" type="text/css" href="{{ style }}">
+
+	</head>
+
+	<body>
+		<div class='main-block-container'>
+			<div class='main-block'>
+				<div class='main-block-inner-top'>
+					<a class='top-links' href='/index/'>main</a>
+					<a class='top-links' href='/stat/'>statistics</a>
+					<a class='top-links' href='/pstat/'>personal<br/>statistics</a>
+					<a class='top-links' id='login-link' href='/login/'>log in</a>
+					<a class='top-links' id='logout-link' href='/logout/'>log out</a>
+				</div>
+				<div class='main-block-inner-box'>
+					{% block content %}{% endblock %}
+				</div>
+				<div class='main-block-inner-footer'>
+
+				</div>
+			</div>
+		</div>
+
+		
+		<script>
+			{{ additional_script }}
+		</script>
+		<script src="../static/js/main.js"></script>
+		<script src="{{ script }}"></script>
+	</body>
+</html>
