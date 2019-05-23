@@ -78,8 +78,10 @@ function make_xhr() {
 			if ( xhr_response.status.code != 0 ) {
 				alert( 'Error! ' + xhr_response.status.code + ': ' + xhr_response.status.text );
 			}
-			input.value = xhr_response.landing_url;
-			set_button_state(BUTTON_STATE_SAVED)
+			else {
+                input.value = xhr_response.landing_url;
+                set_button_state(BUTTON_STATE_SAVED)
+		    }
 		}
 	}
 }

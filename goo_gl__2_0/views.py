@@ -7,28 +7,24 @@ from hashlib import md5
 from goo_gl__2_0 import app
 from goo_gl__2_0.config import BaseConfig
 from goo_gl__2_0.decorators import add_session_decorator, add_user_id
-from goo_gl__2_0.constants import NUMB_SYSTEM_MAP, URL_VALIDATE_REGEX, PARTIAL_HTTP_REGEX, \
-    JSON_STATUSES, JSON_STATUS_INVALID_INPUT, JSON_STATUS_OK, JSON_STATUS_DATA_NOT_FOUND
+from goo_gl__2_0.constants import BlankConstants
 from goo_gl__2_0.forms import LoginForm, RegistrationForm
 from goo_gl__2_0.models import User, Link
 
-flask_redirect = redirect  # TODO: Найти с чем конфликтует redirect
 
-
-def change_number_system(numb, base):
+def make_landing_identificator(numb, base=len(BlankConstants.NUMB_SYSTEM_MAP)):
     out_str = ''
     while True:
         if numb < base:
-            out_str = NUMB_SYSTEM_MAP[numb] + out_str
-            return out_str
-        out_str = NUMB_SYSTEM_MAP[numb % base] + out_str
+            return BlankConstants.NUMB_SYSTEM_MAP[numb] + out_str
+        out_str = BlankConstants.NUMB_SYSTEM_MAP[numb % base] + out_str
         numb = numb // base
 
 
 def validate_url(url):
     if not url:
         return False
-    http_url_matches = URL_VALIDATE_REGEX.match(url)
+    http_url_matches = BlankConstants.URL_VALIDATE_REGEX.match(url)
     if http_url_matches:
         return True
     else:
@@ -41,7 +37,7 @@ def repair_url(url):
     else:
         if validate_url('http://' + url):
             return 'http://' + url
-        url_address = PARTIAL_HTTP_REGEX.sub('', url)
+        url_address = BlankConstants.PARTIAL_HTTP_REGEX.sub('', url)
         url_address = 'http://' + url_address
         if validate_url(url_address):
             return url_address
@@ -50,7 +46,7 @@ def repair_url(url):
 
 
 def throw_error_in_response(status_constant):
-    response = (JSON_STATUSES[status_constant])
+    response = (BlankConstants.JSON_STATUSES[status_constant])
     response = {'status': response}
     response = dumps(response, separators=(',', ':'))
     return Response(response, mimetype='application/json')
@@ -90,20 +86,20 @@ def login(**kwargs):
     user_id = kwargs['current_user_id']
     session = kwargs['session']
     if current_user.is_authenticated:
-        return flask_redirect(url_for('index'))
+        return redirect(url_for('index'))
     form = LoginForm()
     if form.is_submitted():
         if not form.username.data or not form.password.data:
-            return flask_redirect(url_for('login', errorcode=4))
+            return redirect(url_for('login', errorcode=4))
         user = session.query(User). \
             filter_by(username=form.username.data). \
             first()
         if user is None:
-            return flask_redirect(url_for('login', errorcode=2))
+            return redirect(url_for('login', errorcode=2))
         if not user.check_password(form.password.data):
-            return flask_redirect(url_for('login', errorcode=1))
+            return redirect(url_for('login', errorcode=1))
         login_user(user, remember=form.remember_me.data)
-        return flask_redirect(url_for('index'))
+        return redirect(url_for('index'))
     return render_template('login.html',
                            additional_script='var user_id = ' + user_id + ';',
                            style='../static/css/login.css',
@@ -118,16 +114,16 @@ def registration(**kwargs):
     user_id = kwargs['current_user_id']
     session = kwargs['session']
     if current_user.is_authenticated:
-        return flask_redirect(url_for('index'))
+        return redirect(url_for('index'))
     form = RegistrationForm()
     if form.is_submitted():
         if not form.username.data or not form.password.data:
-            return flask_redirect(url_for('registration', errorcode=4))
+            return redirect(url_for('registration', errorcode=4))
         user = session.query(User). \
             filter_by(username=form.username.data). \
             first()
         if user:
-            return flask_redirect(url_for('registration', errorcode=3))
+            return redirect(url_for('registration', errorcode=3))
 
         password = form.password.data.encode('utf-8')
         pwd_hash = md5(password).hexdigest()
@@ -136,7 +132,7 @@ def registration(**kwargs):
         session.commit()
 
         login_user(new_user, remember=form.remember_me.data)
-        return flask_redirect(url_for('index'))
+        return redirect(url_for('index'))
     return render_template('registration.html',
                            additional_script='var user_id = ' + user_id + ';',
                            style='../static/css/login.css',
@@ -147,9 +143,9 @@ def registration(**kwargs):
 @app.route('/logout/')
 def logout():
     logout_user()
-    return flask_redirect(url_for('index'))
+    return redirect(url_for('index'))
 
-# TODO: Прикрутить CSRF токен к форме на этой странице
+
 @app.route('/s/')
 @add_session_decorator
 def save_link(**kwargs):
@@ -158,11 +154,11 @@ def save_link(**kwargs):
     user_id = request.args.get('user_id')
     validate_answer = repair_url(redirect_link)
     if not validate_answer:
-        return throw_error_in_response(JSON_STATUS_INVALID_INPUT)
+        return throw_error_in_response(BlankConstants.JSON_STATUS_INVALID_INPUT)
     if user_id is not None and user_id.isdigit():
         user_id = int(user_id)
     else:
-        return throw_error_in_response(JSON_STATUS_INVALID_INPUT)
+        return throw_error_in_response(BlankConstants.JSON_STATUS_INVALID_INPUT)
     new_link = Link(landing='wait',
                     redirect=validate_answer,
                     views=0,
@@ -170,22 +166,22 @@ def save_link(**kwargs):
     # TODO: проверить возможность sql инъекций
     session.add(new_link)
     session.commit()
-    landing = change_number_system(new_link.id, len(NUMB_SYSTEM_MAP))
+    landing = make_landing_identificator(new_link.id)
     new_link.landing = landing
     session.commit()
     response = {
-                'status': JSON_STATUSES[JSON_STATUS_OK],
-                'landing_url': BaseConfig.SITE_ADDRESS +
-                               BaseConfig.REDIRECT_PATH +
-                               landing
-                }
+        'status': BlankConstants.JSON_STATUSES[BlankConstants.JSON_STATUS_OK],
+        'landing_url': BaseConfig.SITE_ADDRESS +
+                       BaseConfig.REDIRECT_PATH +
+                       landing
+    }
     response = dumps(response)
     return Response(response, mimetype='application/json')
 
 
 @app.route('/r/<landing>')
 @add_session_decorator
-def redirect(landing, **kwargs):
+def redirect_page(landing, **kwargs):
     session = kwargs['session']
     db_link_item = session.query(Link). \
         filter_by(landing=landing). \
@@ -194,7 +190,7 @@ def redirect(landing, **kwargs):
         redirect_url = db_link_item.redirect
         db_link_item.views += 1
         session.commit()
-        return flask_redirect(redirect_url)
+        return redirect(redirect_url)
     else:
         abort(404)
 
@@ -210,9 +206,9 @@ def get_items(**kwargs):
     if user_id and user_id.isdigit():
         user_id = int(user_id)
     else:
-        return throw_error_in_response(JSON_STATUS_INVALID_INPUT)
+        return throw_error_in_response(BlankConstants.JSON_STATUS_INVALID_INPUT)
     if is_sort:
-        # ! TODO: Зафиксить этот ***** баг и убрать этот ******** костыль
+        # ! TODO: Зафиксить тот ***** баг и убрать этот ******** костыль
         item_list = session.query(Link). \
             filter(Link.userID == user_id). \
             order_by(Link.views.desc()). \
@@ -220,31 +216,25 @@ def get_items(**kwargs):
         start_by = int(start_by)
         item_limit = int(item_limit)
         item_list = item_list[start_by:start_by + item_limit]
-    # stmt = session.query(Link). \
-    # filter(Link.user_id >= user_id). \
-    # order_by(Link.views.desc()). \
-    # subquery()
-    # item_list = session.query(). \
-    # add_entity(Link, alias=stmt). \
-    # filter(Link.id >= start_by). \
-    # limit(item_limit)
     else:
         item_list = session.query(Link). \
             filter(Link.id >= start_by). \
-            filter(Link.userID >= user_id). \
+            filter(Link.userID == user_id). \
             limit(item_limit)
     response_dict = {}
     item_container_dict = []
     if not item_list:
-        return throw_error_in_response(JSON_STATUS_DATA_NOT_FOUND)
-    response_dict['status'] = JSON_STATUSES[JSON_STATUS_OK]
+        return throw_error_in_response(BlankConstants.JSON_STATUS_DATA_NOT_FOUND)
+    response_dict['status'] = BlankConstants.JSON_STATUSES[BlankConstants.JSON_STATUS_OK]
     for item in item_list:
-        db_item = {'id': item.id,
-                   'landing': item.landing,
-                   'redirect': item.redirect,
-                   'views': item.views
-                   }
+        db_item = {
+            'id': item.id,
+            'landing': item.landing,
+            'redirect': item.redirect,
+            'views': item.views
+        }
         item_container_dict.append(db_item)
     response_dict['items'] = item_container_dict
     json_response = dumps(response_dict, separators=(',', ':'))
-    return Response(json_response, mimetype='application/json')
+    return Response(json_response,
+                    mimetype='application/json')
