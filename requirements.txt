@@ -5,3 +5,4 @@ Flask_login==0.4.1
 Flask_WTF==0.14.2
 mysql-connector==2.2.9
 uWSGI==2.0.18
+PyMySQL==0.9.3

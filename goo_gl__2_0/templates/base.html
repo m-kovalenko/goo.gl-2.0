@@ -6,7 +6,7 @@
 
 		<title>I will save your link</title>
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-		<link rel="stylesheet" type="text/css" href="../static/css/style.css">
+		<link rel="stylesheet" type="text/css" href="../static/css/main.css">
 		<link rel="stylesheet" type="text/css" href="{{ style }}">
 
 	</head>
@@ -17,9 +17,9 @@
 				<div class='main-block-inner-top'>
 					<a class='top-links' href='/index/'>main</a>
 					<a class='top-links' href='/stat/'>statistics</a>
-					<a class='top-links' href='/pstat/'>personal<br/>statistics</a>
-					<a class='top-links' id='login-link' href='/login/'>log in</a>
-					<a class='top-links' id='logout-link' href='/logout/'>log out</a>
+					<a class='top-links' id='pstat-link' href='/pstat/' style='display: {% if display_pstat %}inline{% else %}none{% endif %}'>personal<br/>statistics</a>
+					<a class='top-links' id='login-link' href='/login/' style='display: {% if display_login %}inline{% else %}none{% endif %}'>log in</a>
+					<a class='top-links' id='logout-link' href='/logout/' style='display: {% if display_logout %}inline{% else %}none{% endif %}'>log out</a>
 				</div>
 				<div class='main-block-inner-box'>
 					{% block content %}{% endblock %}
@@ -34,7 +34,6 @@
 		<script>
 			{{ additional_script }}
 		</script>
-		<script src="../static/js/main.js"></script>
 		<script src="{{ script }}"></script>
 	</body>
 </html>

@@ -55,7 +55,7 @@ def throw_error_in_response(status_constant):
 @app.route('/')
 @app.route('/index/')
 @add_user_id
-def index(**kwargs):
+def index_web_page(**kwargs):
     user_id = kwargs['current_user_id']
     if user_id == '0':
         checkbox_display = 'none'
@@ -63,67 +63,74 @@ def index(**kwargs):
         checkbox_display = 'inline'
     return render_template('index.html',
                            additional_script='var user_id = ' + user_id + ';',
-                           style='../static/css/s_style.css',
+                           style='../static/css/s.css',
                            display_private_checkbox=checkbox_display,
+                           display_pstat=current_user.is_authenticated,
+                           display_login=not current_user.is_authenticated,
+                           display_logout=current_user.is_authenticated,
                            script='../static/js/s.js')
 
 
 @app.route('/stat/')
 @app.route('/pstat/')
 @add_user_id
-def private_stat(**kwargs):
+def stat_web_page(**kwargs):
     user_id = kwargs['current_user_id']
     return render_template('stat.html',
                            additional_script='var user_id = ' + user_id + ';',
-                           style='../static/css/stat_style.css',
+                           style='../static/css/stat.css',
+                           display_pstat=current_user.is_authenticated,
+                           display_login=not current_user.is_authenticated,
+                           display_logout=current_user.is_authenticated,
                            script='../static/js/stat.js')
 
 
 @app.route('/login/', methods=['GET', 'POST'])
 @add_session_decorator
 @add_user_id
-def login(**kwargs):
+def login_web_page(**kwargs):
     user_id = kwargs['current_user_id']
     session = kwargs['session']
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('index_web_page'))
     form = LoginForm()
     if form.is_submitted():
         if not form.username.data or not form.password.data:
-            return redirect(url_for('login', errorcode=4))
+            return redirect(url_for('login_web_page', errorcode=4))
         user = session.query(User). \
             filter_by(username=form.username.data). \
             first()
         if user is None:
-            return redirect(url_for('login', errorcode=2))
+            return redirect(url_for('login_web_page', errorcode=2))
         if not user.check_password(form.password.data):
-            return redirect(url_for('login', errorcode=1))
+            return redirect(url_for('login_web_page', errorcode=1))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('index'))
+        return redirect(url_for('index_web_page'))
     return render_template('login.html',
                            additional_script='var user_id = ' + user_id + ';',
                            style='../static/css/login.css',
                            script='../static/js/login.js',
+                           display_login=not current_user.is_authenticated,
                            form=form)
 
 
 @app.route('/registration/', methods=['GET', 'POST'])
 @add_session_decorator
 @add_user_id
-def registration(**kwargs):
+def registration_web_page(**kwargs):
     user_id = kwargs['current_user_id']
     session = kwargs['session']
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('index_web_page'))
     form = RegistrationForm()
     if form.is_submitted():
         if not form.username.data or not form.password.data:
-            return redirect(url_for('registration', errorcode=4))
+            return redirect(url_for('registration_web_page', errorcode=4))
         user = session.query(User). \
             filter_by(username=form.username.data). \
             first()
         if user:
-            return redirect(url_for('registration', errorcode=3))
+            return redirect(url_for('registration_web_page', errorcode=3))
 
         password = form.password.data.encode('utf-8')
         pwd_hash = md5(password).hexdigest()
@@ -132,7 +139,7 @@ def registration(**kwargs):
         session.commit()
 
         login_user(new_user, remember=form.remember_me.data)
-        return redirect(url_for('index'))
+        return redirect(url_for('index_web_page'))
     return render_template('registration.html',
                            additional_script='var user_id = ' + user_id + ';',
                            style='../static/css/login.css',
@@ -141,14 +148,14 @@ def registration(**kwargs):
 
 
 @app.route('/logout/')
-def logout():
+def logout_web_page():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('index_web_page'))
 
 
 @app.route('/s/')
 @add_session_decorator
-def save_link(**kwargs):
+def save_link_web_page(**kwargs):
     session = kwargs['session']
     redirect_link = request.args.get('link')
     user_id = request.args.get('user_id')
@@ -159,10 +166,8 @@ def save_link(**kwargs):
         user_id = int(user_id)
     else:
         return throw_error_in_response(BlankConstants.JSON_STATUS_INVALID_INPUT)
-    new_link = Link(landing='wait',
-                    redirect=validate_answer,
-                    views=0,
-                    user_id=user_id)
+    new_link = Link(landing='wait', redirect=validate_answer,
+                    views=0, user_id=user_id)
     # TODO: проверить возможность sql инъекций
     session.add(new_link)
     session.commit()
@@ -181,7 +186,7 @@ def save_link(**kwargs):
 
 @app.route('/r/<landing>')
 @add_session_decorator
-def redirect_page(landing, **kwargs):
+def redirect_web_page(landing, **kwargs):
     session = kwargs['session']
     db_link_item = session.query(Link). \
         filter_by(landing=landing). \
@@ -197,7 +202,7 @@ def redirect_page(landing, **kwargs):
 
 @app.route('/g/json')
 @add_session_decorator
-def get_items(**kwargs):
+def get_items_web_page(**kwargs):
     session = kwargs['session']
     start_by = request.args.get('start_by')
     item_limit = request.args.get('limit')

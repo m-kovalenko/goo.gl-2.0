@@ -58,3 +58,7 @@ body {
 .main-block-inner-footer {
 	flex-basis: 15%;
 }
+
+#logout-link, #login-link, pstat-link {
+    display: none;
+}

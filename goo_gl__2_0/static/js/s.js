@@ -2,6 +2,7 @@
 var input = document.getElementById('link-input');
 var button = document.getElementById('submit-button');
 var saved_url = 'Не вводи мой костылик(';
+var link_for_saver = '/s/?';
 
 const url_regex = /[-a-zA-Z0-9@:%\._\+~#=]{2,256}\.[a-z0-9]{2,6}\b[-a-zA-Z0-9@:%_\+.~#?&\/=]*/u;
 
@@ -66,7 +67,7 @@ function make_xhr() {
 		param_user_id = user_id
 	}
 	params += '&user_id=' + encodeURIComponent(param_user_id);
-	xhr.open("GET", '/s?' + params, true);
+	xhr.open("GET", link_for_saver + params, true);
 	xhr.send();
 	xhr.onreadystatechange = function() {
 	if (xhr.readyState != 4) return;

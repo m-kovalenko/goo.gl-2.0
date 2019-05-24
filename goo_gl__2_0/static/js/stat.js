@@ -2,7 +2,7 @@ scrollBox = document.getElementsByClassName('stat-container');
 scrollBox = scrollBox[0];
 
 var stat_container = document.getElementsByClassName('stat-container')[0];
-var server_address = 'http://82.193.112.187:3/r/'
+var server_address = 'http://82.193.112.187/r/'
 var received_blocks_count = 0
 var response_arr
 
