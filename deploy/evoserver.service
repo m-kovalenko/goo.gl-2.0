@@ -1,0 +1,13 @@
+[Unit]
+Description="uWSGI server instance for my_app"
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/html/evoserv/
+Environment=FLASK_ENV=test
+ExecStart=/usr/local/bin/uwsgi --ini /var/www/html/evoserv/app.ini
+
+[Install]
+WantedBy=multi-user.target
