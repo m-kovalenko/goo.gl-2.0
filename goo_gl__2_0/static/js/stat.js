@@ -18,7 +18,7 @@ append_blocks(0,16)
 
 scrollBox.onscroll = function() { 
     if ( scrollBox.scrollTopMax == scrollBox.scrollTop ) { 
-        append_blocks(received_blocks_count +1, 16);
+        append_blocks(received_blocks_count, 16);
     }
 }
 

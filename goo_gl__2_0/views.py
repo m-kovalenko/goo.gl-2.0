@@ -213,14 +213,12 @@ def get_items_web_page(**kwargs):
     else:
         return throw_error_in_response(BlankConstants.JSON_STATUS_INVALID_INPUT)
     if is_sort:
-        # ! TODO: Зафиксить тот ***** баг и убрать этот ******** костыль
         item_list = session.query(Link). \
-            filter(Link.userID == user_id). \
             order_by(Link.views.desc()). \
+            filter(Link.userID == user_id). \
+            offset(start_by). \
+            limit(item_limit). \
             all()
-        start_by = int(start_by)
-        item_limit = int(item_limit)
-        item_list = item_list[start_by:start_by + item_limit]
     else:
         item_list = session.query(Link). \
             filter(Link.id >= start_by). \
