@@ -81,6 +81,7 @@ function make_xhr() {
 			}
 			else {
                 input.value = xhr_response.landing_url;
+                saved_url = xhr_response.landing_url
                 set_button_state(BUTTON_STATE_SAVED)
 		    }
 		}
