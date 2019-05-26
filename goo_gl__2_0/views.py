@@ -110,7 +110,6 @@ def login_web_page(**kwargs):
                            additional_script='var user_id = ' + user_id + ';',
                            style='../static/css/login.css',
                            script='../static/js/login.js',
-                           display_login=not current_user.is_authenticated,
                            form=form)
 
 
@@ -168,7 +167,6 @@ def save_link_web_page(**kwargs):
         return throw_error_in_response(BlankConstants.JSON_STATUS_INVALID_INPUT)
     new_link = Link(landing='wait', redirect=validate_answer,
                     views=0, user_id=user_id)
-    # TODO: проверить возможность sql инъекций
     session.add(new_link)
     session.commit()
     landing = make_landing_identificator(new_link.id)
