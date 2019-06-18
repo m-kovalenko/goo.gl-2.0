@@ -20,7 +20,7 @@ class BlankConstants:
             'text': 'internal error'
         },
         3: {
-            'code': 4,
+            'code': 3,
             'text': 'data not found'
         }
     }
